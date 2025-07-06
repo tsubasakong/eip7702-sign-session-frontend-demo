@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EIP-7702 Session Signing Demo</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import Ethers.js v6 as ES6 module -->
+    <script type="module" src="/main.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">EIP-7702 Session Signing Demo</h1>
+        
+        <!-- Connection Status Area -->
+        <div id="connectionStatus" class="mb-6 text-center">
+            <p id="statusText" class="text-gray-600">Please connect your wallet.</p>
+            <p id="addressText" class="text-sm text-gray-500 mt-2 break-all"></p>
+            <p id="eip7702Status" class="text-sm mt-2"></p>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="space-y-4 mb-6">
+            <button id="connectButton" 
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200">
+                Connect Wallet
+            </button>
+            <button id="signButton" disabled
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                Sign Session Data
+            </button>
+        </div>
+        
+        <!-- Signature Display Area -->
+        <div id="signatureArea" class="hidden">
+            <h3 class="font-semibold text-gray-700 mb-2">Signature:</h3>
+            <div class="bg-gray-100 p-3 rounded break-all text-xs font-mono" id="signatureText"></div>
+        </div>
+        
+        <!-- Message/Notification Box -->
+        <div id="messageBox" class="hidden mt-4 p-3 rounded text-center"></div>
+    </div>
+</body>
+</html>
