@@ -1,20 +1,24 @@
 {
   "name": "eip7702-sign-session-demo",
-  "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "node server/index.js",
+    "dev:full": "concurrently \"npm run dev:backend\" \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "ethers": "^6.15.0"
+    "@aws-sdk/client-s3": "^3.705.0",
+    "ethers": "^6.13.4"
   },
   "devDependencies": {
-    "vite": "^7.0.2"
+    "vite": "^5.4.10",
+    "concurrently": "^9.1.0",
+    "express": "^4.21.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7"
   }
 }

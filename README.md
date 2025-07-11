@@ -1,161 +1,142 @@
 # EIP-7702 Session Signing Demo
 
-A web-based demonstration application for signing EIP-7702 session keys using browser wallets like MetaMask or OKX Wallet.
+A demonstration application for signing session data using EIP-7702 smart wallets, with session storage capabilities via CloudFlare R2.
 
-## 🌟 Features
+## Features
 
-- **Wallet Connection**: Connect to Ethereum wallets via browser extension
-- **EIP-7702 Compatibility Check**: Automatically detects if connected account supports EIP-7702
-- **Session Signing**: Sign structured session data using EIP-712 typed data standard
-- **Modern UI**: Clean, responsive interface built with Tailwind CSS
-- **Real-time Status**: Live updates on connection and signing status
+- ✅ **EIP-7702 Smart Wallet Integration**: Connect and interact with EIP-7702 upgraded wallets
+- ✅ **Session Data Signing**: Sign structured session data using EIP-712 typed data
+- ✅ **Backend Proxy Storage**: Store session data securely via backend API (no CORS issues)
+- ✅ **Real-time Validation**: Check wallet EIP-7702 compatibility and smart contract integration
+- ✅ **Session Retrieval**: Get existing session data via API endpoints
 
-## 🚀 Quick Start
+## Quick Start
 
-### Prerequisites
-
-- Node.js (v16 or higher)
-- A browser wallet extension (MetaMask, OKX Wallet, etc.)
-- Modern web browser with JavaScript enabled
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/tsubasakong/eip7702-sign-session-frontend-demo.git
-cd eip7702-sign-session-frontend-demo
-```
-
-2. Install dependencies:
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-3. Start the development server:
+### 2. Configure Environment
+Create a `.env` file in the project root:
+```env
+# CloudFlare R2 Configuration
+VITE_S3_ACCESS_KEY=your_access_key_here
+VITE_S3_SECRET_KEY=your_secret_key_here
+VITE_S3_ENDPOINT=https://your-account-id.r2.cloudflarestorage.com
+VITE_S3_REGION=auto
+
+# Backend Configuration (Optional)
+VITE_BACKEND_URL=http://localhost:3001
+PORT=3001
+```
+
+### 3. Run the Application
+
+#### Option 1: Run Both Frontend and Backend Together
 ```bash
+npm run dev:full
+```
+
+#### Option 2: Run Separately
+```bash
+# Terminal 1 - Backend
+npm run dev:backend
+
+# Terminal 2 - Frontend  
 npm run dev
 ```
 
-4. Open your browser and navigate to the local development URL (typically `http://localhost:5173`)
+The backend will run on `http://localhost:3001` and the frontend on `http://localhost:5173`.
 
-### Production Build
+## Architecture
 
-To build the project for production:
-
-```bash
-npm run build
+### Backend Proxy Approach (Current)
+```
+Frontend (Browser) → Backend API → CloudFlare R2
 ```
 
-To preview the production build:
+**Benefits:**
+- ✅ No CORS issues
+- ✅ Secure API key handling
+- ✅ Better error handling
+- ✅ Session retrieval capabilities
 
-```bash
-npm run preview
+### Backend API Endpoints
+
+- **Health Check**: `GET /health`
+- **Store Session**: `POST /api/session/store`
+- **Get Session**: `GET /api/session/:userAddress/:chainId?`
+
+## Session Data Structure
+
+Sessions are stored in CloudFlare R2 with the following structure:
+
+```
+users/{wallet_address_lowercase}/context.json
 ```
 
-## 🔧 How It Works
-
-### EIP-7702 Compatibility Detection
-
-The application checks if a connected Ethereum address has existing bytecode:
-- **Has Code**: Account is EIP-7702 ready or already a smart contract
-- **No Code**: Standard Externally Owned Account (EOA)
-
-### Session Signing Process
-
-The demo signs a structured session object using EIP-712 typed data:
-
-```javascript
-const session = {
-    signer: userAddress,           // Connected wallet address
-    executor: executorAddress,     // Executor contract address
-    nonce: randomNonce,           // Secure random value
-    deadline: futureTimestamp     // Session expiry time
+Example session data:
+```json
+{
+  "sessionInfos": {
+    "1": {
+      "id": 123456,
+      "executor": "0x1e8e3a338046913149c84002e22744780200e3be",
+      "validator": "0x0000000000000000000000000000000000000001",
+      "validUntil": 1234567890,
+      "validAfter": 1234567890,
+      "preHook": "0x",
+      "postHook": "0x",
+      "signature": "0x..."
+    }
+  }
 }
 ```
 
-### EIP-712 Domain
+## Configuration
 
-```javascript
-const domain = {
-    name: 'Executor',
-    version: '1',
-    chainId: 1,                   // Ethereum Mainnet
-    verifyingContract: executorAddress
-}
+See `s3-config.md` for detailed configuration instructions including:
+- CloudFlare R2 setup
+- Environment variables
+- Alternative deployment options
+- Legacy direct client approach
+
+## Troubleshooting
+
+### Backend Not Starting
+- Check if port 3001 is available
+- Verify environment variables in `.env` file
+- Check backend console for detailed error messages
+
+### Storage Issues
+- Verify CloudFlare R2 credentials
+- Check backend health: `curl http://localhost:3001/health`
+- Ensure bucket `mesh-context` exists
+
+### Wallet Connection Issues
+- Ensure you have a compatible wallet (MetaMask, OKX)
+- Check if wallet supports EIP-712 typed data signing
+- Verify wallet is upgraded with EIP-7702 for session signing
+
+## Development
+
+### Project Structure
+```
+├── server/           # Backend Express server
+│   └── index.js     # Main server file
+├── main.js          # Frontend application
+├── index.html       # HTML template
+├── package.json     # Dependencies and scripts
+└── s3-config.md     # Detailed configuration guide
 ```
 
-## 🛠 Technology Stack
+### Technologies Used
+- **Frontend**: Vanilla JavaScript, Ethers.js v6, Vite
+- **Backend**: Node.js, Express, AWS SDK v3
+- **Storage**: CloudFlare R2 (S3-compatible)
+- **Blockchain**: Ethereum, EIP-7702, EIP-712
 
-- **Frontend Framework**: Vanilla JavaScript with Vite
-- **Styling**: Tailwind CSS
-- **Blockchain Library**: Ethers.js v6
-- **Build Tool**: Vite
-- **Standards**: EIP-712 (Typed Data), EIP-7702 (Account Abstraction)
+## License
 
-## 📁 Project Structure
-
-```
-eip7702-sign-session-frontend-demo/
-├── index.html          # Main HTML file
-├── main.js             # Core JavaScript functionality
-├── package.json        # Project dependencies and scripts
-├── package-lock.json   # Lock file for dependencies
-└── README.md          # Project documentation
-```
-
-## 🔍 Key Functions
-
-### `connectWallet()`
-- Detects available Ethereum provider
-- Requests account access
-- Checks EIP-7702 compatibility
-- Updates UI with connection status
-
-### `signSessionData()`
-- Constructs EIP-712 typed data payload
-- Generates secure random nonce
-- Sets session deadline
-- Requests signature from wallet
-- Displays result or error
-
-## 🔗 EIP Standards
-
-This project demonstrates:
-
-- **[EIP-712](https://eips.ethereum.org/EIPS/eip-712)**: Ethereum typed structured data hashing and signing
-- **[EIP-7702](https://eips.ethereum.org/EIPS/eip-7702)**: Set EOA account code for one transaction
-
-## 🔒 Security Considerations
-
-- Uses secure random nonce generation
-- Implements proper error handling
-- Session deadlines prevent replay attacks
-- Clear user confirmation for all signatures
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the ISC License - see the LICENSE file for details.
-
-## 🆘 Support
-
-If you encounter any issues or have questions:
-
-1. Check the browser console for error messages
-2. Ensure your wallet is properly connected to Ethereum Mainnet
-3. Verify that your browser wallet extension is enabled and unlocked
-4. Open an issue in this repository for additional support
-
-## 🔗 Useful Links
-
-- [EIP-712 Specification](https://eips.ethereum.org/EIPS/eip-712)
-- [EIP-7702 Specification](https://eips.ethereum.org/EIPS/eip-7702)
-- [Ethers.js Documentation](https://docs.ethers.org/)
-- [MetaMask Developer Docs](https://docs.metamask.io/) 
+MIT 
